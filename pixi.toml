@@ -14,7 +14,12 @@ bench = "flock /tmp/mojo-bench.lock python bench/bench.py"
 PYTHONPATH = "python"
 
 [dependencies]
-mojo = "==1.2.0.dev2026092605"
+mojo = "==1.2.0.dev2026092905"
 python = "3.13.*"
 pytest = "*"
 numpy = "*"
+noise = ">=1.2.2,<2"
+# must track the mojo pin exactly: max 26.7.0.dev2026092*05 and mojo
+# 1.2.0.dev2026092*05 are released as one build. A mismatch makes the solve
+# fail on mojo-compiler ==1.2.0.dev2026092905.
+max = "==26.7.0.dev2026092905"

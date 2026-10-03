@@ -1,6 +1,6 @@
 # Mojo dialect notes (verified by probe against the pinned compiler, not by docs)
 
-Toolchain these notes describe: `mojo ==1.2.0.dev2026092605` (set in `MOJO_PIN` in
+Toolchain these notes describe: `mojo ==1.2.0.dev2026092905` (set in `MOJO_PIN` in
 `bin/port.sh`; every repo receives this file with the marker already substituted).
 Every claim below was checked by compiling it. `bin/probe-confirm.py` and
 `bin/probe-hints.py` in the factory regenerate the list; re-run them after any
@@ -144,8 +144,24 @@ pin; it is released in lockstep, so `mojo ==X` goes with `max ==matching-version
 
 ```toml
 [dependencies]
-mojo = "==1.2.0.dev2026092605"
-max  = "==26.7.0.dev2026092605"
+mojo = "==1.2.0.dev2026092905"
+max  = "==26.7.0.dev2026092905"
+```
+
+**The `max` pin must track `mojo` exactly, build-for-build.** The two are
+published as a pair — `mojo`/`mojo-compiler` at `1.2.0.devYYYYMMDD05` and
+`max`/`max-core` at `26.7.0.devYYYYMMDD05`, sharing the same trailing
+`devYYYYMMDDNNN` stamp. `max` only takes `python <= 3.13`, so
+`python = "3.13.*"` is required alongside them. If the two pins drift by even
+one build the solve fails at `mojo-compiler` with a multi-paragraph
+"conflicts with the versions reported above" message that never names the real
+cause. Check for a shared stamp before reading anything else:
+
+```bash
+curl -sL https://conda.modular.com/max-nightly/linux-64/repodata.json \
+  | python3 -c 'import json,sys; d=json.load(sys.stdin); \
+      print(sorted({v["version"] for v in d["packages.conda"].values() \
+                    if v["name"] in ("mojo","max")})[-4:])'
 ```
 
 **`parallelize` signature changed.** The bracket form no longer type-checks:
